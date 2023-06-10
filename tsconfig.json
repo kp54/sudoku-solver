@@ -1,3 +1,7 @@
 {
-  "extends": "@tsconfig/strictest"
+  "extends": "@tsconfig/recommended",
+  "compilerOptions": {
+    "target": "ESNext",
+  },
+  "include": ["src/main.ts"]
 }
