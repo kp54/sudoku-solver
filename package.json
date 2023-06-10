@@ -8,5 +8,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@tsconfig/strictest": "^2.0.1",
+    "ts-node": "^10.9.1"
+  }
 }
