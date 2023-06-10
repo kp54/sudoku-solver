@@ -1,4 +1,5 @@
-import {dataset} from './data';
+import {readFileSync} from 'node:fs';
+import {decode, encode} from './codec.js';
 import type {FilledCell, Cell, Board, Pos, WritableBoard} from './types';
 
 const enumerate = <T extends readonly unknown[]>(value: T): Array<[number, T[number]]> => value.map((x, i) => [i, x]);
@@ -114,13 +115,16 @@ const formatBoard = (board: Board): string => {
 };
 
 const main = () => {
-	const result = search(dataset[1]);
+	const input = readFileSync('/dev/stdin', 'utf8').toString();
+
+	const result = search(decode(input));
 	if (result === undefined) {
 		console.log('no possible result found.');
 		return;
 	}
 
 	console.log(formatBoard(result));
+	console.log(encode(result));
 };
 
 main();

@@ -1,6 +1,6 @@
-import type {Board, Cell, WritableBoard} from "./types";
+import type {Board, Cell, WritableBoard} from './types';
 
-const decode = (value: string): Board => {
+export const decode = (value: string): Board => {
 	// eslint-disable-next-line unicorn/no-new-array
 	const board = new Array<number[]>(9).fill([]).map(_ => new Array<number>(9).fill(0)) as WritableBoard;
 
@@ -15,7 +15,4 @@ const decode = (value: string): Board => {
 	return board;
 };
 
-export const dataset = [
-	decode('070000043040009610800634900094052000358460020000800530080070091902100005007040802'),
-	decode('000470001004030008200001090007540000506100042900000000030000020600000089000600400'),
-] as const;
+export const encode = (board: Board): string => board.flatMap(row => row.join('')).join('');
