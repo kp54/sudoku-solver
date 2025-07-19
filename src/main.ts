@@ -1,8 +1,10 @@
-import {readFileSync} from 'node:fs';
-import {decode, encode} from './codec.js';
-import type {FilledCell, Cell, Board, Pos, WritableBoard} from './types';
+import { readFileSync } from "node:fs";
+import { decode, encode } from "./codec.js";
+import type { Board, Cell, FilledCell, Pos, WritableBoard } from "./types";
 
-const enumerate = <T extends readonly unknown[]>(value: T): Array<[number, T[number]]> => value.map((x, i) => [i, x]);
+const enumerate = <T extends readonly unknown[]>(
+	value: T,
+): Array<[number, T[number]]> => value.map((x, i) => [i, x]);
 
 const findEmpty = (board: Board): Pos | undefined => {
 	for (const [i, row] of enumerate(board)) {
@@ -96,30 +98,30 @@ const formatBoard = (board: Board): string => {
 	const lines: string[] = [];
 
 	for (const [i, row] of enumerate(board)) {
-		let line = '';
+		let line = "";
 		for (const [j, cell] of enumerate(row)) {
 			line += cell.toString();
 			if ((j + 1) % 3 === 0) {
-				line += '|';
+				line += "|";
 			}
 		}
 
 		lines.push(line.slice(0, -1));
 
 		if ((i + 1) % 3 === 0) {
-			lines.push('---+---+---');
+			lines.push("---+---+---");
 		}
 	}
 
-	return lines.slice(0, -1).join('\n');
+	return lines.slice(0, -1).join("\n");
 };
 
 const main = () => {
-	const input = readFileSync('/dev/stdin', 'utf8').toString();
+	const input = readFileSync("/dev/stdin", "utf8").toString();
 
 	const result = search(decode(input));
 	if (result === undefined) {
-		console.log('no possible result found.');
+		console.log("no possible result found.");
 		return;
 	}
 
