@@ -6,18 +6,20 @@
 	],
 	"settings": {
 		"editor.formatOnSave": true,
-		"xo.enable": true,
-		"xo.format.enable": true,
+		"editor.codeActionsOnSave": {
+			"source.fixAll.biome": "explicit",
+			"source.organizeImports.biome": "explicit",
+		},
 		"[javascript]": {
-			"editor.defaultFormatter": "samverschueren.linter-xo",
+			"editor.defaultFormatter": "biomejs.biome",
 		},
 		"[typescript]": {
-			"editor.defaultFormatter": "samverschueren.linter-xo",
+			"editor.defaultFormatter": "biomejs.biome",
 		},
 	},
 	"extensions": {
 		"recommendations": [
-			"samverschueren.linter-xo",
+			"biomejs.biome",
 		],
 	},
 }

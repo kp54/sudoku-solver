@@ -1,7 +1,8 @@
 {
   "extends": "@tsconfig/recommended",
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "esnext",
+    "module": "esnext",
     "outDir": "dist",
   },
   "include": ["src/main.ts"],
