@@ -12,7 +12,11 @@ export const newBoard = (): WritableBoard =>
 export const cloneBoard = (board: Board): WritableBoard =>
 	structuredClone(board) as WritableBoard;
 
-export const decode = (value: string): Board => {
+export const decode = (value: string): Board | null => {
+	if (!/[0-9]{81}/.test(value)) {
+		return null;
+	}
+
 	const board = newBoard();
 
 	for (let y = 0; y < 9; y++) {

@@ -137,6 +137,11 @@ const main = () => {
 	const input = readFileSync("/dev/stdin", "utf8").toString();
 	const query = decode(input);
 
+	if (query === null) {
+		console.log("malformed input given.");
+		return;
+	}
+
 	console.log(`${formatBoard(query)}\n`);
 
 	const result = search(query);
