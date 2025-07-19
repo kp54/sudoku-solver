@@ -117,7 +117,7 @@ const formatBoard = (board: Board): string => {
 	for (const [y, row] of enumerate(board)) {
 		let line = "";
 		for (const [x, cell] of enumerate(row)) {
-			line += cell.toString();
+			line += cell === 0 ? "." : cell.toString();
 			if (x % 3 === 2) {
 				line += "|";
 			}
@@ -135,14 +135,18 @@ const formatBoard = (board: Board): string => {
 
 const main = () => {
 	const input = readFileSync("/dev/stdin", "utf8").toString();
+	const query = decode(input);
 
-	const result = search(decode(input));
+	console.log(`${formatBoard(query)}\n`);
+
+	const result = search(query);
 	if (result === null) {
 		console.log("no possible result found.");
 		return;
 	}
 
-	console.log(formatBoard(result));
+	console.log(`${formatBoard(result)}\n`);
+
 	console.log(encode(result));
 };
 
