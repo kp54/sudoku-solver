@@ -1,24 +1,48 @@
 import { readFileSync } from "node:fs";
-import { decode, encode } from "./codec.js";
-import type { Board, Cell, FilledCell, Pos, WritableBoard } from "./types";
+import type { Board, Cell, FilledCell, Pos } from "./types";
+import { cloneBoard, decode, encode, enumerate } from "./utils.js";
 
-const enumerate = <T extends readonly unknown[]>(
-	value: T,
-): Array<[number, T[number]]> => value.map((x, i) => [i, x]);
-
-const findEmpty = (board: Board): Pos | undefined => {
-	for (const [i, row] of enumerate(board)) {
-		for (const [j, cell] of enumerate(row)) {
+const findEmpty = (board: Board): Pos | null => {
+	for (const [y, row] of enumerate(board)) {
+		for (const [x, cell] of enumerate(row)) {
 			if (cell === 0) {
-				return [j, i] as Pos;
+				return [x, y] as Pos;
 			}
 		}
 	}
 
-	return undefined;
+	return null;
 };
 
-const listGroupValues = (board: Board, pos: Pos): FilledCell[] => {
+const listRowValues = (board: Board, pos: Pos): FilledCell[] => {
+	const [_, posY] = pos;
+	const filledValues: FilledCell[] = [];
+
+	for (let x = 0; x < 9; x++) {
+		const cell = board[posY][x];
+		if (cell !== 0) {
+			filledValues.push(cell);
+		}
+	}
+
+	return filledValues;
+};
+
+const listColumnValues = (board: Board, pos: Pos): FilledCell[] => {
+	const [posX, _] = pos;
+	const filledValues: FilledCell[] = [];
+
+	for (let y = 0; y < 9; y++) {
+		const cell = board[y][posX];
+		if (cell !== 0) {
+			filledValues.push(cell);
+		}
+	}
+
+	return filledValues;
+};
+
+const listSquareValues = (board: Board, pos: Pos): FilledCell[] => {
 	const [posX, posY] = pos;
 
 	const offsetX = Math.trunc(posX / 3) * 3;
@@ -26,11 +50,11 @@ const listGroupValues = (board: Board, pos: Pos): FilledCell[] => {
 
 	const filledValues = new Set<FilledCell>();
 
-	for (let i = 0; i < 3; i++) {
-		const y = i + offsetY;
+	for (let iy = 0; iy < 3; iy++) {
+		const y = iy + offsetY;
 
-		for (let j = 0; j < 3; j++) {
-			const x = j + offsetX;
+		for (let ix = 0; ix < 3; ix++) {
+			const x = ix + offsetX;
 			const cell = board[y][x];
 
 			if (cell !== 0) {
@@ -43,24 +67,17 @@ const listGroupValues = (board: Board, pos: Pos): FilledCell[] => {
 };
 
 const findOptions = (board: Board, pos: Pos): Cell[] => {
-	const [posX, posY] = pos;
 	const options = new Set<FilledCell>([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
-	for (let i = 0; i < 9; i++) {
-		const cell = board[posY][i];
-		if (cell !== 0) {
-			options.delete(cell);
-		}
+	for (const value of listRowValues(board, pos)) {
+		options.delete(value);
 	}
 
-	for (let i = 0; i < 9; i++) {
-		const cell = board[i][posX];
-		if (cell !== 0) {
-			options.delete(cell);
-		}
+	for (const value of listColumnValues(board, pos)) {
+		options.delete(value);
 	}
 
-	for (const value of listGroupValues(board, pos)) {
+	for (const value of listSquareValues(board, pos)) {
 		options.delete(value);
 	}
 
@@ -69,16 +86,16 @@ const findOptions = (board: Board, pos: Pos): Cell[] => {
 
 const put = (board: Board, pos: Pos, cell: Cell): Board => {
 	const [posX, posY] = pos;
-	const newBoard = structuredClone(board as WritableBoard);
-	newBoard[posY][posX] = cell;
+	const updated = cloneBoard(board);
+	updated[posY][posX] = cell;
 
-	return newBoard;
+	return updated;
 };
 
-const search = (board: Board): Board | undefined => {
+const search = (board: Board): Board | null => {
 	const pos = findEmpty(board);
 
-	if (pos === undefined) {
+	if (pos === null) {
 		return board;
 	}
 
@@ -86,29 +103,29 @@ const search = (board: Board): Board | undefined => {
 
 	for (const option of options) {
 		const result = search(put(board, pos, option));
-		if (result !== undefined) {
+		if (result !== null) {
 			return result;
 		}
 	}
 
-	return undefined;
+	return null;
 };
 
 const formatBoard = (board: Board): string => {
 	const lines: string[] = [];
 
-	for (const [i, row] of enumerate(board)) {
+	for (const [y, row] of enumerate(board)) {
 		let line = "";
-		for (const [j, cell] of enumerate(row)) {
+		for (const [x, cell] of enumerate(row)) {
 			line += cell.toString();
-			if ((j + 1) % 3 === 0) {
+			if (x % 3 === 2) {
 				line += "|";
 			}
 		}
 
 		lines.push(line.slice(0, -1));
 
-		if ((i + 1) % 3 === 0) {
+		if (y % 3 === 2) {
 			lines.push("---+---+---");
 		}
 	}
@@ -120,7 +137,7 @@ const main = () => {
 	const input = readFileSync("/dev/stdin", "utf8").toString();
 
 	const result = search(decode(input));
-	if (result === undefined) {
+	if (result === null) {
 		console.log("no possible result found.");
 		return;
 	}
